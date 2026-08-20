@@ -88,7 +88,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void HandleInput()
     {
-        // 좌우 이��� 입력
+        // 좌우 이동 입력
         float horizontalInput = 0f;
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
             horizontalInput = -1f;
