@@ -1,3 +1,84 @@
 using UnityEngine;
 
-/// <summary>\n/// 게임 최적화 도구\n/// 성능 모니터링 및 최적화 기능\n/// </summary>\npublic class PerformanceOptimizer : MonoBehaviour\n{\n    [SerializeField]\n    private bool _enableVSync = true;\n\n    [SerializeField]\n    private int _targetFrameRate = 60;\n\n    [SerializeField]\n    private float _monitoringInterval = 1f;\n\n    private float _lastMonitoringTime = 0f;\n    private float _currentFPS = 0f;\n    private int _frameCount = 0;\n\n    private void Start()\n    {\n        // V-Sync 설정\n        QualitySettings.vSyncCount = _enableVSync ? 1 : 0;\n\n        // 프레임 레이트 설정\n        Application.targetFrameRate = _targetFrameRate;\n\n        Debug.Log($\"성능 최적화 설정: FPS={_targetFrameRate}, V-Sync={_enableVSync}\");\n    }\n\n    private void Update()\n    {\n        _frameCount++;\n        float elapsed = Time.time - _lastMonitoringTime;\n\n        if (elapsed >= _monitoringInterval)\n        {\n            _currentFPS = _frameCount / elapsed;\n            _frameCount = 0;\n            _lastMonitoringTime = Time.time;\n\n            MonitorPerformance();\n        }\n    }\n\n    /// <summary>\n    /// 성능 모니터링\n    /// </summary>\n    private void MonitorPerformance()\n    {\n        // FPS가 30 이하면 경고\n        if (_currentFPS < 30)\n        {\n            Debug.LogWarning($\"FPS 저하: {_currentFPS:F1} FPS\");\n            ApplyPerformanceOptimizations();\n        }\n    }\n\n    /// <summary>\n    /// 성능 최적화 적용\n    /// </summary>\n    private void ApplyPerformanceOptimizations()\n    {\n        // 텍스처 품질 감소\n        QualitySettings.masterTextureLimit = Mathf.Min(QualitySettings.masterTextureLimit + 1, 3);\n\n        // 쉐이더 품질 감소\n        QualitySettings.antiAliasing = Mathf.Max(QualitySettings.antiAliasing / 2, 0);\n\n        Debug.Log(\"성능 최적화 적용됨\");\n    }\n\n    /// <summary>\n    /// 현재 FPS 반환\n    /// </summary>\n    public float CurrentFPS => _currentFPS;\n\n    /// <summary>\n    /// 메모리 사용량 반환\n    /// </summary>\n    public long MemoryUsage => System.GC.GetTotalMemory(false);\n}\n
+/// <summary>
+/// 성능 최적화 도구
+/// 성능 모니터링 및 최적화 기능
+/// </summary>
+public class PerformanceOptimizer : MonoBehaviour
+{
+    [SerializeField]
+    private bool _enableVSync = true;
+
+    [SerializeField]
+    private int _targetFrameRate = 60;
+
+    [SerializeField]
+    private float _monitoringInterval = 1f;
+
+    private float _lastMonitoringTime = 0f;
+    private float _currentFPS = 0f;
+    private int _frameCount = 0;
+
+    private void Start()
+    {
+        // V-Sync 설정
+        QualitySettings.vSyncCount = _enableVSync ? 1 : 0;
+
+        // 프레임 레이트 설정
+        Application.targetFrameRate = _targetFrameRate;
+
+        Debug.Log($"성능 최적화 설정: FPS={_targetFrameRate}, V-Sync={_enableVSync}");
+    }
+
+    private void Update()
+    {
+        _frameCount++;
+        float elapsed = Time.time - _lastMonitoringTime;
+
+        if (elapsed >= _monitoringInterval)
+        {
+            _currentFPS = _frameCount / elapsed;
+            _frameCount = 0;
+            _lastMonitoringTime = Time.time;
+
+            MonitorPerformance();
+        }
+    }
+
+    /// <summary>
+    /// 성능 모니터링
+    /// </summary>
+    private void MonitorPerformance()
+    {
+        // FPS가 30 이하면 경고
+        if (_currentFPS < 30)
+        {
+            Debug.LogWarning($"FPS 저하: {_currentFPS:F1} FPS");
+            ApplyPerformanceOptimizations();
+        }
+    }
+
+    /// <summary>
+    /// 성능 최적화 적용
+    /// </summary>
+    private void ApplyPerformanceOptimizations()
+    {
+        // 텍스처 품질 감소
+        QualitySettings.masterTextureLimit = Mathf.Min(QualitySettings.masterTextureLimit + 1, 3);
+
+        // 쉐이더 품질 감소
+        QualitySettings.antiAliasing = Mathf.Max(QualitySettings.antiAliasing / 2, 0);
+
+        Debug.Log("성능 최적화 적용됨");
+    }
+
+    /// <summary>
+    /// 현재 FPS 반환
+    /// </summary>
+    public float CurrentFPS => _currentFPS;
+
+    /// <summary>
+    /// 메모리 사용량 반환
+    /// </summary>
+    public long MemoryUsage => System.GC.GetTotalMemory(false);
+}

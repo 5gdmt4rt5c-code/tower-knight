@@ -2,4 +2,145 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// 저장 시스템 매니저\n/// PlayerPrefs를 사용한 게임 데이터 저장/로드\n/// </summary>\npublic class SaveManager : MonoBehaviour\n{\n    public static SaveManager Instance { get; private set; }\n\n    [SerializeField]\n    private string _playerNameKey = \"PlayerName\";\n\n    [SerializeField]\n    private string _levelKey = \"Level\";\n\n    [SerializeField]\n    private string _experienceKey = \"Experience\";\n\n    [SerializeField]\n    private string _currentFloorKey = \"CurrentFloor\";\n\n    [SerializeField]\n    private string _scoreKey = \"Score\";\n\n    [SerializeField]\n    private string _totalPlayTimeKey = \"TotalPlayTime\";\n\n    private float _sessionStartTime;\n\n    private void Awake()\n    {\n        if (Instance != null && Instance != this)\n        {\n            Destroy(gameObject);\n            return;\n        }\n\n        Instance = this;\n        DontDestroyOnLoad(gameObject);\n    }\n\n    private void Start()\n    {\n        _sessionStartTime = Time.time;\n    }\n\n    /// <summary>\n    /// 플레이어 데이터 저장\n    /// </summary>\n    public void SavePlayerData(PlayerStats playerStats, string playerName)\n    {\n        PlayerPrefs.SetString(_playerNameKey, playerName);\n        PlayerPrefs.SetInt(_levelKey, playerStats.CurrentLevel);\n        PlayerPrefs.SetInt(_experienceKey, playerStats.CurrentExperience);\n        PlayerPrefs.SetInt(_scoreKey, GameManager.Instance.Score);\n        PlayerPrefs.SetInt(_currentFloorKey, GameManager.Instance.CurrentFloor);\n\n        // 플레이 시간 저장\n        float totalPlayTime = PlayerPrefs.GetFloat(_totalPlayTimeKey, 0f) + (Time.time - _sessionStartTime);\n        PlayerPrefs.SetFloat(_totalPlayTimeKey, totalPlayTime);\n\n        PlayerPrefs.Save();\n        Debug.Log(\"플레이어 데이터 저장 완료\");\n    }\n\n    /// <summary>\n    /// 플레이어 데이터 로드\n    /// </summary>\n    public bool LoadPlayerData(out string playerName, out int level, out int experience, out int floor)\n    {\n        if (!PlayerPrefs.HasKey(_playerNameKey))\n        {\n            playerName = \"\";\n            level = 1;\n            experience = 0;\n            floor = 1;\n            return false;\n        }\n\n        playerName = PlayerPrefs.GetString(_playerNameKey);\n        level = PlayerPrefs.GetInt(_levelKey, 1);\n        experience = PlayerPrefs.GetInt(_experienceKey, 0);\n        floor = PlayerPrefs.GetInt(_currentFloorKey, 1);\n\n        Debug.Log($\"플레이어 데이터 로드: {playerName} (Lv.{level})\");\n        return true;\n    }\n\n    /// <summary>\n    /// 게임 통계 저장\n    /// </summary>\n    public void SaveGameStats(int score, int floor)\n    {\n        PlayerPrefs.SetInt(_scoreKey, score);\n        PlayerPrefs.SetInt(_currentFloorKey, floor);\n        PlayerPrefs.Save();\n\n        Debug.Log($\"게임 통계 저장: 점수={score}, 층={floor}\");\n    }\n\n    /// <summary>\n    /// 게임 통계 로드\n    /// </summary>\n    public (int score, int floor) LoadGameStats()\n    {\n        int score = PlayerPrefs.GetInt(_scoreKey, 0);\n        int floor = PlayerPrefs.GetInt(_currentFloorKey, 1);\n\n        return (score, floor);\n    }\n\n    /// <summary>\n    /// 전체 플레이 시간 조회\n    /// </summary>\n    public float GetTotalPlayTime()\n    {\n        return PlayerPrefs.GetFloat(_totalPlayTimeKey, 0f);\n    }\n\n    /// <summary>\n    /// 데이터 초기화\n    /// </summary>\n    public void ResetAllData()\n    {\n        PlayerPrefs.DeleteAll();\n        _sessionStartTime = Time.time;\n        Debug.Log(\"모든 데이터 초기화 완료\");\n    }\n\n    /// <summary>\n    /// 특정 데이터 초기화\n    /// </summary>\n    public void ResetPlayerData()\n    {\n        PlayerPrefs.DeleteKey(_playerNameKey);\n        PlayerPrefs.DeleteKey(_levelKey);\n        PlayerPrefs.DeleteKey(_experienceKey);\n        PlayerPrefs.DeleteKey(_currentFloorKey);\n        PlayerPrefs.DeleteKey(_scoreKey);\n        PlayerPrefs.Save();\n\n        Debug.Log(\"플레이어 데이터 초기화 완료\");\n    }\n}\n
+/// 저장 시스템 매니저
+/// PlayerPrefs를 사용한 게임 데이터 저장/로드
+/// </summary>
+public class SaveManager : MonoBehaviour
+{
+    public static SaveManager Instance { get; private set; }
+
+    [SerializeField]
+    private string _playerNameKey = "PlayerName";
+
+    [SerializeField]
+    private string _levelKey = "Level";
+
+    [SerializeField]
+    private string _experienceKey = "Experience";
+
+    [SerializeField]
+    private string _currentFloorKey = "CurrentFloor";
+
+    [SerializeField]
+    private string _scoreKey = "Score";
+
+    [SerializeField]
+    private string _totalPlayTimeKey = "TotalPlayTime";
+
+    private float _sessionStartTime;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private void Start()
+    {
+        _sessionStartTime = Time.time;
+    }
+
+    /// <summary>
+    /// 플레이어 데이터 저장
+    /// </summary>
+    public void SavePlayerData(PlayerStats playerStats, string playerName)
+    {
+        PlayerPrefs.SetString(_playerNameKey, playerName);
+        PlayerPrefs.SetInt(_levelKey, playerStats.CurrentLevel);
+        PlayerPrefs.SetInt(_experienceKey, playerStats.CurrentExperience);
+        PlayerPrefs.SetInt(_scoreKey, GameManager.Instance.Score);
+        PlayerPrefs.SetInt(_currentFloorKey, GameManager.Instance.CurrentFloor);
+
+        // 플레이 시간 저장
+        float totalPlayTime = PlayerPrefs.GetFloat(_totalPlayTimeKey, 0f) + (Time.time - _sessionStartTime);
+        PlayerPrefs.SetFloat(_totalPlayTimeKey, totalPlayTime);
+
+        PlayerPrefs.Save();
+        Debug.Log("플레이어 데이터 저장 완료");
+    }
+
+    /// <summary>
+    /// 플레이어 데이터 로드
+    /// </summary>
+    public bool LoadPlayerData(out string playerName, out int level, out int experience, out int floor)
+    {
+        if (!PlayerPrefs.HasKey(_playerNameKey))
+        {
+            playerName = "";
+            level = 1;
+            experience = 0;
+            floor = 1;
+            return false;
+        }
+
+        playerName = PlayerPrefs.GetString(_playerNameKey);
+        level = PlayerPrefs.GetInt(_levelKey, 1);
+        experience = PlayerPrefs.GetInt(_experienceKey, 0);
+        floor = PlayerPrefs.GetInt(_currentFloorKey, 1);
+
+        Debug.Log($"플레이어 데이터 로드: {playerName} (Lv.{level})");
+        return true;
+    }
+
+    /// <summary>
+    /// 게임 통계 저장
+    /// </summary>
+    public void SaveGameStats(int score, int floor)
+    {
+        PlayerPrefs.SetInt(_scoreKey, score);
+        PlayerPrefs.SetInt(_currentFloorKey, floor);
+        PlayerPrefs.Save();
+
+        Debug.Log($"게임 통계 저장: 점수={score}, 층={floor}");
+    }
+
+    /// <summary>
+    /// 게임 통계 로드
+    /// </summary>
+    public (int score, int floor) LoadGameStats()
+    {
+        int score = PlayerPrefs.GetInt(_scoreKey, 0);
+        int floor = PlayerPrefs.GetInt(_currentFloorKey, 1);
+
+        return (score, floor);
+    }
+
+    /// <summary>
+    /// 전체 플레이 시간 조회
+    /// </summary>
+    public float GetTotalPlayTime()
+    {
+        return PlayerPrefs.GetFloat(_totalPlayTimeKey, 0f);
+    }
+
+    /// <summary>
+    /// 데이터 초기화
+    /// </summary>
+    public void ResetAllData()
+    {
+        PlayerPrefs.DeleteAll();
+        _sessionStartTime = Time.time;
+        Debug.Log("모든 데이터 초기화 완료");
+    }
+
+    /// <summary>
+    /// 특정 데이터 초기화
+    /// </summary>
+    public void ResetPlayerData()
+    {
+        PlayerPrefs.DeleteKey(_playerNameKey);
+        PlayerPrefs.DeleteKey(_levelKey);
+        PlayerPrefs.DeleteKey(_experienceKey);
+        PlayerPrefs.DeleteKey(_currentFloorKey);
+        PlayerPrefs.DeleteKey(_scoreKey);
+        PlayerPrefs.Save();
+
+        Debug.Log("플레이어 데이터 초기화 완료");
+    }
+}
